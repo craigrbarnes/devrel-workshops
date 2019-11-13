@@ -114,12 +114,35 @@ python -m http.server 8888
 ```
 Then navigate to: [localhost:8888](http://localhost:8888)
 
+## Method 2: Install harp.gl modules through npm
+
+*These instructions are also available on the [harp.gl github repo](https://github.com/heremaps/harp.gl/blob/master/docs/GettingStartedGuide.md).*
+
+```bash
+mkdir harp.gl-tutorial
+cd harp.gl-tutorial
+npx -p yo -p @here/generator-harp.gl yo @here/harp.gl
+```
+
+As the command executes, it will prompt you for some information:
+
+- package name: what you would like to name your project
+- access token: your HERE XYZ token (obtained in the previous step)
+
+Next, run the following commands:
+```Bash
+npm install
+npm start
+```
+A local server will start and you will be able to view the project at [localhost:8888](http://localhost:8888).
+
+
 If everything is correct you should see:
 ![alt text](img/first-map.png)
 
 ## Adding Isoline polygon
 
-Now we want to add an isoline using [HERE's Isoline router](https://developer.here.com/documentation/routing/topics/request-isoline.html).
+Now we want to add an isoline using [HERE's Isoline router](https://developer.here.com/documentation/routing/topics/request-isoline.html). The isoline router calculate the area that can be reached by driving for a given time or distance. This are is returned as a polygon.
 
 Add the following to the *Isoline code section* above
 ```javascript
@@ -170,10 +193,18 @@ isoline.then(data => {
     } );
 });
 ```
-If everything is correct you should see:
+Running the above code should look like the image below:
+
 ![alt text](img/isoline-map.png)
 
 ## Display Places within Isoline
+
+Now we want to find all restaurants which are inside of the isoline. The basic procedure is: get a list of all restaurants within the isoline radius + some expanded area. To get the *places* we can use HERE's Places API which allows us to get restaurants within N meters of a latitude, longitude. We can then use the isoline polygon to *clip* the places to only those which intersect the interior of the isoline.
+
+The code below retrieves the places using the places API which you can read about at [developer.here.com](https://developer.here.com/documentation/places/dev_guide/topics/what-is.html).
+
+The code then uses the isoline polygon to clip the returned coordinates by the isoline polygon we computed above. To do this we use [turf.js](https://turfjs.org/) to clip the points by the polygon.
+
 ```javascript
 // Places
 
@@ -223,6 +254,8 @@ places.then(pois =>{
     });
 });
 ```
-If everything is correct you should see:
+If everything is correct you should see something like the image below.
 
 ![alt text](img/isoline-places-map.png)
+
+Once you have this working you can start to play with styling, returning the restaurants as a list, change the types or Places, and the isoline parameters.
